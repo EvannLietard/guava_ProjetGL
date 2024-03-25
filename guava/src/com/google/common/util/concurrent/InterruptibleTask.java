@@ -106,15 +106,6 @@ abstract class InterruptibleTask<T extends @Nullable Object>
      */
     boolean restoreInterruptedBit = false;
     int spinCount = 0;
-    // Interrupting Cow Says:
-    //  ______
-    // < Spin >
-    //  ------
-    //        \   ^__^
-    //         \  (oo)\_______
-    //            (__)\       )\/\
-    //                ||----w |
-    //                ||     ||
     Runnable state = get();
     Blocker blocker = null;
     while (state instanceof Blocker || state == PARKED) {
@@ -131,15 +122,6 @@ abstract class InterruptibleTask<T extends @Nullable Object>
          * protect ourselves from this, we park ourselves and tell our interrupter that we did so.
          */
         if (state == PARKED || compareAndSet(state, PARKED)) {
-          // Interrupting Cow Says:
-          //  ______
-          // < Park >
-          //  ------
-          //        \   ^__^
-          //         \  (oo)\_______
-          //            (__)\       )\/\
-          //                ||----w |
-          //                ||     ||
           // We need to clear the interrupted bit prior to calling park and maintain it in case we
           // wake up spuriously.
           restoreInterruptedBit = Thread.interrupted() || restoreInterruptedBit;
