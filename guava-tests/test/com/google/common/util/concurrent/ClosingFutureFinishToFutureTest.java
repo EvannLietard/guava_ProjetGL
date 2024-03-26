@@ -23,7 +23,6 @@ import static com.google.common.util.concurrent.Uninterruptibles.getUninterrupti
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.util.concurrent.ClosingFuture.ClosingCallable;
-import com.google.common.util.concurrent.ClosingFuture.DeferredCloser;
 import java.io.Closeable;
 import java.util.concurrent.ExecutionException;
 

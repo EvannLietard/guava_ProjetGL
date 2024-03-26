@@ -44,6 +44,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ClosingFuture.Combiner.AsyncCombiningCallable;
 import com.google.common.util.concurrent.ClosingFuture.Combiner.CombiningCallable;
 import com.google.common.util.concurrent.Futures.FutureCombiner;
+import com.google.common.util.concurrent.DeferredCloser;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.DoNotMock;
 import com.google.j2objc.annotations.RetainedWith;
@@ -196,52 +197,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public final class ClosingFuture<V extends @Nullable Object> {
 
   private static final LazyLogger logger = new LazyLogger(ClosingFuture.class);
-
-  /**
-   * An object that can capture objects to be closed later, when a {@link ClosingFuture} pipeline is
-   * done.
-   */
-  public static final class DeferredCloser {
-    @RetainedWith private final CloseableList list;
-
-    DeferredCloser(CloseableList list) {
-      this.list = list;
-    }
-
-    /**
-     * Captures an object to be closed when a {@link ClosingFuture} pipeline is done.
-     *
-     * <p>For users of the {@code -jre} flavor of Guava, the object can be any {@code
-     * AutoCloseable}. For users of the {@code -android} flavor, the object must be a {@code
-     * Closeable}. (For more about the flavors, see <a
-     * href="https://github.com/google/guava#adding-guava-to-your-build">Adding Guava to your
-     * build</a>.)
-     *
-     * <p>Be careful when targeting an older SDK than you are building against (most commonly when
-     * building for Android): Ensure that any object you pass implements the interface not just in
-     * your current SDK version but also at the oldest version you support. For example, <a
-     * href="https://developer.android.com/sdk/api_diff/16/">API Level 16</a> is the first version
-     * in which {@code Cursor} is {@code Closeable}. To support older versions, pass a wrapper
-     * {@code Closeable} with a method reference like {@code cursor::close}.
-     *
-     * <p>Note that this method is still binary-compatible between flavors because the erasure of
-     * its parameter type is {@code Object}, not {@code AutoCloseable} or {@code Closeable}.
-     *
-     * @param closeable the object to be closed (see notes above)
-     * @param closingExecutor the object will be closed on this executor
-     * @return the first argument
-     */
-    @CanIgnoreReturnValue
-    @ParametricNullness
-    public <C extends @Nullable Object & @Nullable AutoCloseable> C eventuallyClose(
-        @ParametricNullness C closeable, Executor closingExecutor) {
-      checkNotNull(closingExecutor);
-      if (closeable != null) {
-        list.add(closeable, closingExecutor);
-      }
-      return closeable;
-    }
-  }
 
   /**
    * An operation that computes a result.
@@ -2196,7 +2151,7 @@ public final class ClosingFuture<V extends @Nullable Object> {
   }
 
   // TODO(dpb): Should we use a pair of ArrayLists instead of an IdentityHashMap?
-  private static final class CloseableList extends IdentityHashMap<AutoCloseable, Executor>
+  public static final class CloseableList extends IdentityHashMap<AutoCloseable, Executor>
       implements Closeable {
     private final DeferredCloser closer = new DeferredCloser(this);
     private volatile boolean closed;
@@ -2250,7 +2205,7 @@ public final class ClosingFuture<V extends @Nullable Object> {
       }
     }
 
-    void add(@CheckForNull AutoCloseable closeable, Executor executor) {
+    public void add(@CheckForNull AutoCloseable closeable, Executor executor) {
       checkNotNull(executor);
       if (closeable == null) {
         return;
