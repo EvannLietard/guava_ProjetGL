@@ -41,7 +41,6 @@ import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.util.concurrent.ClosingFuture.AsyncClosingCallable;
 import com.google.common.util.concurrent.ClosingFuture.AsyncClosingFunction;
-import com.google.common.util.concurrent.ClosingFuture.ClosingCallable;
 import com.google.common.util.concurrent.ClosingFuture.ClosingFunction;
 import com.google.common.util.concurrent.ClosingFuture.Combiner;
 import com.google.common.util.concurrent.ClosingFuture.Combiner.AsyncCombiningCallable;
