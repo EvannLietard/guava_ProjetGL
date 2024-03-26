@@ -44,7 +44,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ClosingFuture.Combiner.AsyncCombiningCallable;
 import com.google.common.util.concurrent.ClosingFuture.Combiner.CombiningCallable;
 import com.google.common.util.concurrent.Futures.FutureCombiner;
-import com.google.common.util.concurrent.DeferredCloser;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.DoNotMock;
 import com.google.j2objc.annotations.RetainedWith;
@@ -198,23 +197,7 @@ public final class ClosingFuture<V extends @Nullable Object> {
 
   private static final LazyLogger logger = new LazyLogger(ClosingFuture.class);
 
-  /**
-   * An operation that computes a result.
-   *
-   * @param <V> the type of the result
-   */
-  @FunctionalInterface
-  public interface ClosingCallable<V extends @Nullable Object> {
-    /**
-     * Computes a result, or throws an exception if unable to do so.
-     *
-     * <p>Any objects that are passed to {@link DeferredCloser#eventuallyClose(Object, Executor)
-     * closer.eventuallyClose()} will be closed when the {@link ClosingFuture} pipeline is done (but
-     * not before this method completes), even if this method throws or the pipeline is cancelled.
-     */
-    @ParametricNullness
-    V call(DeferredCloser closer) throws Exception;
-  }
+
 
   /**
    * An operation that computes a {@link ClosingFuture} of a result.

@@ -22,7 +22,6 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static com.google.common.util.concurrent.Uninterruptibles.getUninterruptibly;
 import static org.junit.Assert.assertThrows;
 
-import com.google.common.util.concurrent.ClosingFuture.ClosingCallable;
 import java.io.Closeable;
 import java.util.concurrent.ExecutionException;
 

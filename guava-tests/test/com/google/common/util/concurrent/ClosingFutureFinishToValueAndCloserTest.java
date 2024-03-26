@@ -24,7 +24,6 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertThrows;
 
-import com.google.common.util.concurrent.ClosingFuture.ClosingCallable;
 import com.google.common.util.concurrent.ClosingFuture.ValueAndCloser;
 import com.google.common.util.concurrent.ClosingFuture.ValueAndCloserConsumer;
 import java.io.Closeable;
