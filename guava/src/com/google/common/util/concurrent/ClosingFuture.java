@@ -197,25 +197,7 @@ public final class ClosingFuture<V extends @Nullable Object> {
 
   private static final LazyLogger logger = new LazyLogger(ClosingFuture.class);
 
-  /**
-   * A function from an input to a result.
-   *
-   * @param <T> the type of the input to the function
-   * @param <U> the type of the result of the function
-   */
-  @FunctionalInterface
-  public interface ClosingFunction<T extends @Nullable Object, U extends @Nullable Object> {
 
-    /**
-     * Applies this function to an input, or throws an exception if unable to do so.
-     *
-     * <p>Any objects that are passed to {@link DeferredCloser#eventuallyClose(Object, Executor)
-     * closer.eventuallyClose()} will be closed when the {@link ClosingFuture} pipeline is done (but
-     * not before this method completes), even if this method throws or the pipeline is cancelled.
-     */
-    @ParametricNullness
-    U apply(DeferredCloser closer, @ParametricNullness T input) throws Exception;
-  }
 
   /**
    * A function from an input to a {@link ClosingFuture} of a result.
