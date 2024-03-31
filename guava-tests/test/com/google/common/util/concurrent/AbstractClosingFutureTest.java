@@ -47,7 +47,6 @@ import com.google.common.util.concurrent.ClosingFuture.Combiner2.ClosingFunction
 import com.google.common.util.concurrent.ClosingFuture.Combiner3.ClosingFunction3;
 import com.google.common.util.concurrent.ClosingFuture.Combiner4.ClosingFunction4;
 import com.google.common.util.concurrent.ClosingFuture.Combiner5.ClosingFunction5;
-import com.google.common.util.concurrent.ClosingFuture.Peeker;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -705,7 +704,7 @@ public abstract class AbstractClosingFutureTest extends TestCase {
     final ClosingFuture<String> input1 = ClosingFuture.from(immediateFuture("value1"));
     final ClosingFuture<Object> input2Failed = failedClosingFuture();
     final ClosingFuture<String> nonInput = ClosingFuture.from(immediateFuture("value3"));
-    final AtomicReference<ClosingFuture.Peeker> capturedPeeker = new AtomicReference<>();
+    final AtomicReference<Peeker> capturedPeeker = new AtomicReference<>();
     ClosingFuture<TestCloseable> closingFuture =
         ClosingFuture.whenAllComplete(ImmutableList.of(input1, input2Failed))
             .call(
@@ -786,7 +785,7 @@ public abstract class AbstractClosingFutureTest extends TestCase {
     final ClosingFuture<String> input1 = ClosingFuture.from(immediateFuture("value1"));
     final ClosingFuture<Object> input2Failed = failedClosingFuture();
     final ClosingFuture<String> nonInput = ClosingFuture.from(immediateFuture("value3"));
-    final AtomicReference<ClosingFuture.Peeker> capturedPeeker = new AtomicReference<>();
+    final AtomicReference<Peeker> capturedPeeker = new AtomicReference<>();
     ClosingFuture<TestCloseable> closingFuture =
         ClosingFuture.whenAllComplete(ImmutableList.of(input1, input2Failed))
             .callAsync(

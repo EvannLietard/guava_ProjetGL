@@ -957,70 +957,9 @@ public final class ClosingFuture<V extends @Nullable Object> {
     return derived;
   }
 
-  private void becomeSubsumedInto(CloseableList otherCloseables) {
+  public void becomeSubsumedInto(CloseableList otherCloseables) {
     checkAndUpdateState(OPEN, SUBSUMED);
     otherCloseables.add(closeables, directExecutor());
-  }
-
-  /**
-   * An object that can return the value of the {@link ClosingFuture}s that are passed to {@link
-   * #whenAllComplete(Iterable)} or {@link #whenAllSucceed(Iterable)}.
-   *
-   * <p>Only for use by a {@link CombiningCallable} or {@link AsyncCombiningCallable} object.
-   */
-  public static final class Peeker {
-    private final ImmutableList<ClosingFuture<?>> futures;
-    private volatile boolean beingCalled;
-
-    private Peeker(ImmutableList<ClosingFuture<?>> futures) {
-      this.futures = checkNotNull(futures);
-    }
-
-    /**
-     * Returns the value of {@code closingFuture}.
-     *
-     * @throws ExecutionException if {@code closingFuture} is a failed step
-     * @throws CancellationException if the {@code closingFuture}'s future was cancelled
-     * @throws IllegalArgumentException if {@code closingFuture} is not one of the futures passed to
-     *     {@link #whenAllComplete(Iterable)} or {@link #whenAllComplete(Iterable)}
-     * @throws IllegalStateException if called outside of a call to {@link
-     *     CombiningCallable#call(DeferredCloser, Peeker)} or {@link
-     *     AsyncCombiningCallable#call(DeferredCloser, Peeker)}
-     */
-    @ParametricNullness
-    public final <D extends @Nullable Object> D getDone(ClosingFuture<D> closingFuture)
-        throws ExecutionException {
-      checkState(beingCalled);
-      checkArgument(futures.contains(closingFuture));
-      return Futures.getDone(closingFuture.future);
-    }
-
-    @ParametricNullness
-    private <V extends @Nullable Object> V call(
-        CombiningCallable<V> combiner, CloseableList closeables) throws Exception {
-      beingCalled = true;
-      CloseableList newCloseables = new CloseableList();
-      try {
-        return combiner.call(newCloseables.closer, this);
-      } finally {
-        closeables.add(newCloseables, directExecutor());
-        beingCalled = false;
-      }
-    }
-
-    private <V extends @Nullable Object> FluentFuture<V> callAsync(
-        AsyncCombiningCallable<V> combiner, CloseableList closeables) throws Exception {
-      beingCalled = true;
-      CloseableList newCloseables = new CloseableList();
-      try {
-        ClosingFuture<V> closingFuture = combiner.call(newCloseables.closer, this);
-        closingFuture.becomeSubsumedInto(closeables);
-        return closingFuture.future;
-      } finally {
-        closeables.add(newCloseables, directExecutor());
-        beingCalled = false;
-      }
-    }
   }
 
   /**
@@ -2016,7 +1955,7 @@ public final class ClosingFuture<V extends @Nullable Object> {
   // TODO(dpb): Should we use a pair of ArrayLists instead of an IdentityHashMap?
   public static final class CloseableList extends IdentityHashMap<AutoCloseable, Executor>
       implements Closeable {
-    private final DeferredCloser closer = new DeferredCloser(this);
+    public final DeferredCloser closer = new DeferredCloser(this);
     private volatile boolean closed;
     @CheckForNull private volatile CountDownLatch whenClosed;
 
