@@ -14,7 +14,7 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
  * An object that can return the value of the {@link ClosingFuture}s that are passed to {@link
  * #whenAllComplete(Iterable)} or {@link #whenAllSucceed(Iterable)}.
  *
- * <p>Only for use by a {@link ClosingFuture.Combiner.CombiningCallable} or {@link ClosingFuture.Combiner.AsyncCombiningCallable} object.
+ * <p>Only for use by a {@link CombiningCallable} or {@link AsyncCombiningCallable} object.
  */
 public final class Peeker {
     private final ImmutableList<ClosingFuture<?>> futures;
@@ -32,8 +32,8 @@ public final class Peeker {
      * @throws IllegalArgumentException if {@code closingFuture} is not one of the futures passed to
      *     {@link #whenAllComplete(Iterable)} or {@link #whenAllComplete(Iterable)}
      * @throws IllegalStateException if called outside of a call to {@link
-     *     ClosingFuture.Combiner.CombiningCallable#call(DeferredCloser, Peeker)} or {@link
-     *     ClosingFuture.Combiner.AsyncCombiningCallable#call(DeferredCloser, Peeker)}
+     *     CombiningCallable#call(DeferredCloser, Peeker)} or {@link
+     *     AsyncCombiningCallable#call(DeferredCloser, Peeker)}
      */
     @ParametricNullness
     public  <D extends @Nullable Object> D getDone(ClosingFuture<D> closingFuture)
@@ -45,7 +45,7 @@ public final class Peeker {
 
     @ParametricNullness
     public <V extends @Nullable Object> V call(
-            ClosingFuture.Combiner.CombiningCallable<V> combiner, ClosingFuture.CloseableList closeables) throws Exception {
+            CombiningCallable<V> combiner, ClosingFuture.CloseableList closeables) throws Exception {
         beingCalled = true;
         ClosingFuture.CloseableList newCloseables = new ClosingFuture.CloseableList();
         try {
@@ -57,7 +57,7 @@ public final class Peeker {
     }
 
     public <V extends @Nullable Object> FluentFuture<V> callAsync(
-            ClosingFuture.Combiner.AsyncCombiningCallable<V> combiner, ClosingFuture.CloseableList closeables) throws Exception {
+            AsyncCombiningCallable<V> combiner, ClosingFuture.CloseableList closeables) throws Exception {
         beingCalled = true;
         ClosingFuture.CloseableList newCloseables = new ClosingFuture.CloseableList();
         try {
