@@ -996,6 +996,8 @@ public final class LongMath {
       ~((1 << 1) | (1 << 7) | (1 << 11) | (1 << 13) | (1 << 17) | (1 << 19) | (1 << 23)
           | (1 << 29));
 
+  private static final long PRECALCULATED_PRIME = 289;
+
   /**
    * Returns {@code true} if {@code n} is a <a
    * href="http://mathworld.wolfram.com/PrimeNumber.html">prime number</a>: an integer <i>greater
@@ -1046,7 +1048,7 @@ public final class LongMath {
     if (n % 7 == 0 || n % 11 == 0 || n % 13 == 0) {
       return false;
     }
-    if (n < 17 * 17) {
+    if (n < PRECALCULATED_PRIME) {
       return true;
     }
 
