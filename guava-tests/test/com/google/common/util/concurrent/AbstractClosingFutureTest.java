@@ -48,7 +48,6 @@ import com.google.common.util.concurrent.ClosingFuture.Combiner3.ClosingFunction
 import com.google.common.util.concurrent.ClosingFuture.Combiner4.ClosingFunction4;
 import com.google.common.util.concurrent.ClosingFuture.Combiner5.ClosingFunction5;
 import com.google.common.util.concurrent.ClosingFuture.Peeker;
-import com.google.common.util.concurrent.ClosingFuture.ValueAndCloser;
 import com.google.common.util.concurrent.ClosingFuture.ValueAndCloserConsumer;
 import java.io.Closeable;
 import java.io.IOException;
