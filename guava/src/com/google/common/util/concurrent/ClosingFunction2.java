@@ -6,7 +6,7 @@ import java.util.concurrent.Executor;
 
 /**
  * A function that returns a value when applied to the values of the two futures passed to
- * {@link #whenAllSucceed(ClosingFuture, ClosingFuture)}.
+ * {@link ClosingFuture#whenAllSucceed(ClosingFuture, ClosingFuture)}.
  *
  * @param <V1> the type returned by the first future
  * @param <V2> the type returned by the second future
@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
  */
 @FunctionalInterface
 public interface ClosingFunction2<
-        V1 extends @Nullable Object, V2 extends @Nullable Object, U extends @Nullable Object> {
+        V1 extends @Nullable Object, V2 extends @Nullable Object, U extends @Nullable Object>  {
 
     /**
      * Applies this function to two inputs, or throws an exception if unable to do so.

@@ -7,7 +7,7 @@ import java.util.concurrent.Executor;
 
 /**
  * A generic {@link Combiner} that lets you use a lambda or method reference to combine two {@link
- * ClosingFuture}s. Use {@link #whenAllSucceed(ClosingFuture, ClosingFuture)} to start this
+ * ClosingFuture}s. Use {@link ClosingFuture#whenAllSucceed(ClosingFuture, ClosingFuture)} to start this
  * combination.
  *
  * @param <V1> the type returned by the first future
@@ -29,7 +29,7 @@ public final class Combiner2<V1 extends @Nullable Object, V2 extends @Nullable O
      * combining function to their values. The function can use a {@link DeferredCloser} to capture
      * objects to be closed when the pipeline is done.
      *
-     * <p>If this combiner was returned by {@link #whenAllSucceed(ClosingFuture, ClosingFuture)} and
+     * <p>If this combiner was returned by {@link ClosingFuture#whenAllSucceed(ClosingFuture, ClosingFuture)} and
      * any of the inputs fail, so will the returned step.
      *
      * <p>If the function throws a {@code CancellationException}, the pipeline will be cancelled.
@@ -61,7 +61,7 @@ public final class Combiner2<V1 extends @Nullable Object, V2 extends @Nullable O
      * DeferredCloser} to capture objects to be closed when the pipeline is done (other than those
      * captured by the returned {@link ClosingFuture}).
      *
-     * <p>If this combiner was returned by {@link #whenAllSucceed(ClosingFuture, ClosingFuture)} and
+     * <p>If this combiner was returned by {@link ClosingFuture#whenAllSucceed(ClosingFuture, ClosingFuture)} and
      * any of the inputs fail, so will the returned step.
      *
      * <p>If the function throws a {@code CancellationException}, the pipeline will be cancelled.
@@ -84,7 +84,7 @@ public final class Combiner2<V1 extends @Nullable Object, V2 extends @Nullable O
      *   <li>Call {@link DeferredCloser#eventuallyClose(Object, Executor) closer.eventuallyClose()}
      *       for every closeable object this step creates in order to capture it for later closing.
      *   <li>Return a {@code ClosingFuture}. To turn a {@link ListenableFuture} into a {@code
-     *       ClosingFuture} call {@link #from(ListenableFuture)}.
+     *       ClosingFuture} call {@link ClosingFuture#from(ListenableFuture)}.
      * </ul>
      *
      * <p>The same warnings about doing heavyweight operations within {@link

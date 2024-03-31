@@ -6,7 +6,7 @@ import java.util.concurrent.Executor;
 
 /**
  * A function that returns a value when applied to the values of the five futures passed to
- * {@link #whenAllSucceed(ClosingFuture, ClosingFuture, ClosingFuture, ClosingFuture,
+ * {@link ClosingFuture#whenAllSucceed(ClosingFuture, ClosingFuture, ClosingFuture, ClosingFuture,
  * ClosingFuture)}.
  *
  * @param <V1> the type returned by the first future

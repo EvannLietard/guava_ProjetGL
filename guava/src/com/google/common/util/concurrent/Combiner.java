@@ -12,7 +12,7 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 /**
  * A builder of a {@link ClosingFuture} step that is derived from more than one input step.
  *
- * <p>See {@link #whenAllComplete(Iterable)} and {@link #whenAllSucceed(Iterable)} for how to
+ * <p>See {@link ClosingFuture#whenAllComplete(Iterable)} and {@link ClosingFuture#whenAllSucceed(Iterable)} for how to
  * instantiate this class.
  *
  * <p>Example:
@@ -55,7 +55,7 @@ public class Combiner {
      * combining function to their values. The function can use a {@link DeferredCloser} to capture
      * objects to be closed when the pipeline is done.
      *
-     * <p>If this combiner was returned by a {@link #whenAllSucceed} method and any of the inputs
+     * <p>If this combiner was returned by a {@link ClosingFuture#whenAllSucceed} method and any of the inputs
      * fail, so will the returned step.
      *
      * <p>If the combiningCallable throws a {@code CancellationException}, the pipeline will be
@@ -90,7 +90,7 @@ public class Combiner {
      * DeferredCloser} to capture objects to be closed when the pipeline is done (other than those
      * captured by the returned {@link ClosingFuture}).
      *
-     * <p>If this combiner was returned by a {@link #whenAllSucceed} method and any of the inputs
+     * <p>If this combiner was returned by a {@link ClosingFuture#whenAllSucceed} method and any of the inputs
      * fail, so will the returned step.
      *
      * <p>If the combiningCallable throws a {@code CancellationException}, the pipeline will be
@@ -114,7 +114,7 @@ public class Combiner {
      *   <li>Call {@link DeferredCloser#eventuallyClose(Object, Executor) closer.eventuallyClose()}
      *       for every closeable object this step creates in order to capture it for later closing.
      *   <li>Return a {@code ClosingFuture}. To turn a {@link ListenableFuture} into a {@code
-     *       ClosingFuture} call {@link #from(ListenableFuture)}.
+     *       ClosingFuture} call {@link ClosingFuture#from(ListenableFuture)}.
      * </ul>
      *
      * <p>The same warnings about doing heavyweight operations within {@link
