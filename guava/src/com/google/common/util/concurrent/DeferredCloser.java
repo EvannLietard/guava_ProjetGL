@@ -15,9 +15,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class DeferredCloser {
     @RetainedWith
-    private final ClosingFuture.CloseableList list;
+    private final CloseableList list;
 
-    DeferredCloser(ClosingFuture.CloseableList list) {
+    DeferredCloser(CloseableList list) {
         this.list = list;
     }
 

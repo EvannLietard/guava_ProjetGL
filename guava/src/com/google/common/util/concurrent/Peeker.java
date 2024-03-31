@@ -45,9 +45,9 @@ public final class Peeker {
 
     @ParametricNullness
     public <V extends @Nullable Object> V call(
-            CombiningCallable<V> combiner, ClosingFuture.CloseableList closeables) throws Exception {
+            CombiningCallable<V> combiner, CloseableList closeables) throws Exception {
         beingCalled = true;
-        ClosingFuture.CloseableList newCloseables = new ClosingFuture.CloseableList();
+        CloseableList newCloseables = new CloseableList();
         try {
             return combiner.call(newCloseables.closer, this);
         } finally {
@@ -57,9 +57,9 @@ public final class Peeker {
     }
 
     public <V extends @Nullable Object> FluentFuture<V> callAsync(
-            AsyncCombiningCallable<V> combiner, ClosingFuture.CloseableList closeables) throws Exception {
+            AsyncCombiningCallable<V> combiner, CloseableList closeables) throws Exception {
         beingCalled = true;
-        ClosingFuture.CloseableList newCloseables = new ClosingFuture.CloseableList();
+        CloseableList newCloseables = new CloseableList();
         try {
             ClosingFuture<V> closingFuture = combiner.call(newCloseables.closer, this);
             closingFuture.becomeSubsumedInto(closeables);

@@ -37,7 +37,7 @@ import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
         "Use ClosingFuture.whenAllSucceed() or .whenAllComplete() instead.")
 public class Combiner {
 
-    private final ClosingFuture.CloseableList closeables = new ClosingFuture.CloseableList();
+    private final CloseableList closeables = new CloseableList();
 
     private final boolean allMustSucceed;
     protected final ImmutableList<ClosingFuture<?>> inputs;

@@ -960,13 +960,6 @@ public final class ClosingFuture<V extends @Nullable Object> {
     otherCloseables.add(closeables, directExecutor());
   }
 
-
-
-
-
-
-
-
   @Override
   public String toString() {
     // TODO(dpb): Better toString, in the style of Futures.transform etc.
@@ -981,40 +974,7 @@ public final class ClosingFuture<V extends @Nullable Object> {
     }
   }
 
-  private static void closeQuietly(@CheckForNull final AutoCloseable closeable, Executor executor) {
-    if (closeable == null) {
-      return;
-    }
-    try {
-      executor.execute(
-          () -> {
-            try {
-              closeable.close();
-            } catch (Exception e) {
-              /*
-               * In guava-jre, any kind of Exception may be thrown because `closeable` has type
-               * `AutoCloseable`.
-               *
-               * In guava-android, the only kinds of Exception that may be thrown are
-               * RuntimeException and IOException because `closeable` has type `Closeable`—except
-               * that we have to account for sneaky checked exception.
-               */
-              restoreInterruptIfIsInterruptedException(e);
-              logger.get().log(WARNING, "thrown by close()", e);
-            }
-          });
-    } catch (RejectedExecutionException e) {
-      if (logger.get().isLoggable(WARNING)) {
-        logger
-            .get()
-            .log(
-                WARNING,
-                String.format("while submitting close to %s; will close inline", executor),
-                e);
-      }
-      closeQuietly(closeable, directExecutor());
-    }
-  }
+
 
   private void checkAndUpdateState(State oldState, State newState) {
     checkState(
@@ -1028,91 +988,7 @@ public final class ClosingFuture<V extends @Nullable Object> {
     return state.compareAndSet(oldState, newState);
   }
 
-  // TODO(dpb): Should we use a pair of ArrayLists instead of an IdentityHashMap?
-  public static final class CloseableList extends IdentityHashMap<AutoCloseable, Executor>
-      implements Closeable {
-    public final DeferredCloser closer = new DeferredCloser(this);
-    private volatile boolean closed;
-    @CheckForNull private volatile CountDownLatch whenClosed;
 
-    <V extends @Nullable Object, U extends @Nullable Object>
-        ListenableFuture<U> applyClosingFunction(
-            ClosingFunction<? super V, U> transformation, @ParametricNullness V input)
-            throws Exception {
-      // TODO(dpb): Consider ways to defer closing without creating a separate CloseableList.
-      CloseableList newCloseables = new CloseableList();
-      try {
-        return immediateFuture(transformation.apply(newCloseables.closer, input));
-      } finally {
-        add(newCloseables, directExecutor());
-      }
-    }
-
-    <V extends @Nullable Object, U extends @Nullable Object>
-        FluentFuture<U> applyAsyncClosingFunction(
-            AsyncClosingFunction<V, U> transformation, @ParametricNullness V input)
-            throws Exception {
-      // TODO(dpb): Consider ways to defer closing without creating a separate CloseableList.
-      CloseableList newCloseables = new CloseableList();
-      try {
-        ClosingFuture<U> closingFuture = transformation.apply(newCloseables.closer, input);
-        closingFuture.becomeSubsumedInto(newCloseables);
-        return closingFuture.future;
-      } finally {
-        add(newCloseables, directExecutor());
-      }
-    }
-
-    @Override
-    public void close() {
-      if (closed) {
-        return;
-      }
-      synchronized (this) {
-        if (closed) {
-          return;
-        }
-        closed = true;
-      }
-      for (Map.Entry<AutoCloseable, Executor> entry : entrySet()) {
-        closeQuietly(entry.getKey(), entry.getValue());
-      }
-      clear();
-      if (whenClosed != null) {
-        whenClosed.countDown();
-      }
-    }
-
-    public void add(@CheckForNull AutoCloseable closeable, Executor executor) {
-      checkNotNull(executor);
-      if (closeable == null) {
-        return;
-      }
-      synchronized (this) {
-        if (!closed) {
-          put(closeable, executor);
-          return;
-        }
-      }
-      closeQuietly(closeable, executor);
-    }
-
-    /**
-     * Returns a latch that reaches zero when this objects' deferred closeables have been closed.
-     */
-    CountDownLatch whenClosedCountDown() {
-      if (closed) {
-        return new CountDownLatch(0);
-      }
-      synchronized (this) {
-        if (closed) {
-          return new CountDownLatch(0);
-        }
-        checkState(whenClosed == null);
-        return whenClosed = new CountDownLatch(1);
-      }
-    }
-  }
 
   /**
    * Returns an object that can be used to wait until this objects' deferred closeables have all had
