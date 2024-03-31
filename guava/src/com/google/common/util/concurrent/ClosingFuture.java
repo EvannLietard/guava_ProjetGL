@@ -197,25 +197,6 @@ public final class ClosingFuture<V extends @Nullable Object> {
 
   private static final LazyLogger logger = new LazyLogger(ClosingFuture.class);
 
-
-
-
-
-
-  /**
-   * Represents an operation that accepts a {@link ValueAndCloser} for the last step in a {@link
-   * ClosingFuture} pipeline.
-   *
-   * @param <V> the type of the final value of a successful pipeline
-   * @see ClosingFuture#finishToValueAndCloser(ValueAndCloserConsumer, Executor)
-   */
-  @FunctionalInterface
-  public interface ValueAndCloserConsumer<V extends @Nullable Object> {
-
-    /** Accepts a {@link ValueAndCloser} for the last step in a {@link ClosingFuture} pipeline. */
-    void accept(ValueAndCloser<V> valueAndCloser);
-  }
-
   /**
    * Starts a {@link ClosingFuture} pipeline by submitting a callable block to an executor.
    *
