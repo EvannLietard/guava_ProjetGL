@@ -39,7 +39,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Reflection;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StandardSubjectBuilder;
-import com.google.common.util.concurrent.ClosingFuture.AsyncClosingCallable;
 import com.google.common.util.concurrent.ClosingFuture.AsyncClosingFunction;
 import com.google.common.util.concurrent.ClosingFuture.ClosingFunction;
 import com.google.common.util.concurrent.ClosingFuture.Combiner;
