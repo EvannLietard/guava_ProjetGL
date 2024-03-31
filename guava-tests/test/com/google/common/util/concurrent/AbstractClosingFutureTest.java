@@ -39,7 +39,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.Reflection;
 import com.google.common.truth.FailureStrategy;
 import com.google.common.truth.StandardSubjectBuilder;
-import com.google.common.util.concurrent.ClosingFuture.Combiner4.ClosingFunction4;
 import com.google.common.util.concurrent.ClosingFuture.Combiner5.ClosingFunction5;
 import java.io.Closeable;
 import java.io.IOException;
