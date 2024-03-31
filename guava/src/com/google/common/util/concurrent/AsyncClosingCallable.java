@@ -22,9 +22,4 @@ public interface AsyncClosingCallable<V extends @Nullable Object> {
     ClosingFuture<V> call(DeferredCloser closer) throws Exception;
 }
 
-/**
- * A function from an input to a result.
- *
- * @param <T> the type of the input to the function
- * @param <U> the type of the result of the function
- */
+
