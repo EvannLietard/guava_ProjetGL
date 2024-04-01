@@ -816,6 +816,12 @@ public final class LongMath {
    *
    * @throws IllegalArgumentException if {@code n < 0}, {@code k < 0}, or {@code k > n}
    */
+  /**
+   * Returns {@code n} choose {@code k}, also known as the binomial coefficient of {@code n} and
+   * {@code k}, or {@link Long#MAX_VALUE} if the result does not fit in a {@code long}.
+   *
+   * @throws IllegalArgumentException if {@code n < 0}, {@code k < 0}, or {@code k > n}
+   */
   public static long binomial(int n, int k) {
     checkNonNegative("n", n);
     checkNonNegative("k", k);
@@ -830,50 +836,58 @@ public final class LongMath {
         return n;
       default:
         if (n < factorials.length) {
-          return factorials[n] / (factorials[k] * factorials[n - k]);
+          return binomialUsingFactorials(n,k);
         } else if (k >= biggestBinomials.length || n > biggestBinomials[k]) {
           return Long.MAX_VALUE;
         } else if (k < biggestSimpleBinomials.length && n <= biggestSimpleBinomials[k]) {
-          // guaranteed not to overflow
-          long result = n--;
-          for (int i = 2; i <= k; n--, i++) {
-            result *= n;
-            result /= i;
-          }
-          return result;
+          return binomialSimple(n,k);
         } else {
-          int nBits = LongMath.log2(n, RoundingMode.CEILING);
-
-          long result = 1;
-          long numerator = n--;
-          long denominator = 1;
-
-          int numeratorBits = nBits;
-          // This is an upper bound on log2(numerator, ceiling).
-
-          /*
-           * We want to do this in long math for speed, but want to avoid overflow. We adapt the
-           * technique previously used by BigIntegerMath: maintain separate numerator and
-           * denominator accumulators, multiplying the fraction into result when near overflow.
-           */
-          for (int i = 2; i <= k; i++, n--) {
-            if (numeratorBits + nBits < Long.SIZE - 1) {
-              // It's definitely safe to multiply into numerator and denominator.
-              numerator *= n;
-              denominator *= i;
-              numeratorBits += nBits;
-            } else {
-              // It might not be safe to multiply into numerator and denominator,
-              // so multiply (numerator / denominator) into result.
-              result = multiplyFraction(result, numerator, denominator);
-              numerator = n;
-              denominator = i;
-              numeratorBits = nBits;
-            }
-          }
-          return multiplyFraction(result, numerator, denominator);
+          return binomialWithFractionalMult(n,k);
         }
     }
+  }
+  private static long binomialUsingFactorials(int n, int k) {
+    return factorials[n] / (factorials[k] * factorials[n - k]);
+  }
+
+  private static long binomialSimple(int n, int k) {
+    long result = n--;
+    for (int i = 2; i <= k; n--, i++) {
+      result *= n;
+      result /= i;
+    }
+    return result;
+  }
+
+  private static long binomialWithFractionalMult(int n, int k){
+    int nBits = LongMath.log2(n, RoundingMode.CEILING);
+    long result = 1;
+    long numerator = n--;
+    long denominator = 1;
+    int numeratorBits = nBits;
+    // This is an upper bound on log2(numerator, ceiling).
+
+    /*
+     * We want to do this in long math for speed, but want to avoid overflow. We adapt the
+     * technique previously used by BigIntegerMath: maintain separate numerator and
+     * denominator accumulators, multiplying the fraction into result when near overflow.
+     */
+    for (int i = 2; i <= k; i++, n--) {
+      if (numeratorBits + nBits < Long.SIZE - 1) {
+        // It's definitely safe to multiply into numerator and denominator.
+        numerator *= n;
+        denominator *= i;
+        numeratorBits += nBits;
+      } else {
+        // It might not be safe to multiply into numerator and denominator,
+        // so multiply (numerator / denominator) into result.
+        result = multiplyFraction(result, numerator, denominator);
+        numerator = n;
+        denominator = i;
+        numeratorBits = nBits;
+      }
+    }
+    return multiplyFraction(result, numerator, denominator);
   }
 
   /** Returns (x * numerator / denominator), which is assumed to come out to an integral value. */
