@@ -1270,106 +1270,120 @@ public final class LongMath {
   @SuppressWarnings("deprecation")
   @J2ktIncompatible
   @GwtIncompatible
+
   public static double roundToDouble(long x, RoundingMode mode) {
-    // Logic adapted from ToDoubleRounder.
     double roundArbitrarily = (double) x;
     long roundArbitrarilyAsLong = (long) roundArbitrarily;
-    int cmpXToRoundArbitrarily;
-
-    if (roundArbitrarilyAsLong == Long.MAX_VALUE) {
-      /*
-       * For most values, the conversion from roundArbitrarily to roundArbitrarilyAsLong is
-       * lossless. In that case we can compare x to roundArbitrarily using Longs.compare(x,
-       * roundArbitrarilyAsLong). The exception is for values where the conversion to double rounds
-       * up to give roundArbitrarily equal to 2^63, so the conversion back to long overflows and
-       * roundArbitrarilyAsLong is Long.MAX_VALUE. (This is the only way this condition can occur as
-       * otherwise the conversion back to long pads with zero bits.) In this case we know that
-       * roundArbitrarily > x. (This is important when x == Long.MAX_VALUE ==
-       * roundArbitrarilyAsLong.)
-       */
-      cmpXToRoundArbitrarily = -1;
-    } else {
-      cmpXToRoundArbitrarily = Longs.compare(x, roundArbitrarilyAsLong);
-    }
-
+    int cmpXToRoundArbitrarily = compareXToRoundArbitrarily(x, roundArbitrarilyAsLong);
     switch (mode) {
       case UNNECESSARY:
-        checkRoundingUnnecessary(cmpXToRoundArbitrarily == 0);
-        return roundArbitrarily;
+        return handleUnnecessaryMode(cmpXToRoundArbitrarily, roundArbitrarily);
       case FLOOR:
-        return (cmpXToRoundArbitrarily >= 0)
-            ? roundArbitrarily
-            : DoubleUtils.nextDown(roundArbitrarily);
+        return handleFloorMode(cmpXToRoundArbitrarily, roundArbitrarily);
       case CEILING:
-        return (cmpXToRoundArbitrarily <= 0) ? roundArbitrarily : Math.nextUp(roundArbitrarily);
+        return handleCeilingMode(cmpXToRoundArbitrarily, roundArbitrarily);
       case DOWN:
-        if (x >= 0) {
-          return (cmpXToRoundArbitrarily >= 0)
-              ? roundArbitrarily
-              : DoubleUtils.nextDown(roundArbitrarily);
-        } else {
-          return (cmpXToRoundArbitrarily <= 0) ? roundArbitrarily : Math.nextUp(roundArbitrarily);
-        }
+        return handleDownMode(x, cmpXToRoundArbitrarily, roundArbitrarily);
       case UP:
-        if (x >= 0) {
-          return (cmpXToRoundArbitrarily <= 0) ? roundArbitrarily : Math.nextUp(roundArbitrarily);
-        } else {
-          return (cmpXToRoundArbitrarily >= 0)
-              ? roundArbitrarily
-              : DoubleUtils.nextDown(roundArbitrarily);
-        }
+        return handleUpMode(x, cmpXToRoundArbitrarily, roundArbitrarily);
       case HALF_DOWN:
       case HALF_UP:
       case HALF_EVEN:
-        {
-          long roundFloor;
-          double roundFloorAsDouble;
-          long roundCeiling;
-          double roundCeilingAsDouble;
-
-          if (cmpXToRoundArbitrarily >= 0) {
-            roundFloorAsDouble = roundArbitrarily;
-            roundFloor = roundArbitrarilyAsLong;
-            roundCeilingAsDouble = Math.nextUp(roundArbitrarily);
-            roundCeiling = (long) Math.ceil(roundCeilingAsDouble);
-          } else {
-            roundCeilingAsDouble = roundArbitrarily;
-            roundCeiling = roundArbitrarilyAsLong;
-            roundFloorAsDouble = DoubleUtils.nextDown(roundArbitrarily);
-            roundFloor = (long) Math.floor(roundFloorAsDouble);
-          }
-
-          long deltaToFloor = x - roundFloor;
-          long deltaToCeiling = roundCeiling - x;
-
-          if (roundCeiling == Long.MAX_VALUE) {
-            // correct for Long.MAX_VALUE as discussed above: roundCeilingAsDouble must be 2^63, but
-            // roundCeiling is 2^63-1.
-            deltaToCeiling++;
-          }
-
-          int diff = Longs.compare(deltaToFloor, deltaToCeiling);
-          if (diff < 0) { // closer to floor
-            return roundFloorAsDouble;
-          } else if (diff > 0) { // closer to ceiling
-            return roundCeilingAsDouble;
-          }
-          // halfway between the representable values; do the half-whatever logic
-          switch (mode) {
-            case HALF_EVEN:
-              return ((DoubleUtils.getSignificand(roundFloorAsDouble) & 1L) == 0)
-                  ? roundFloorAsDouble
-                  : roundCeilingAsDouble;
-            case HALF_DOWN:
-              return (x >= 0) ? roundFloorAsDouble : roundCeilingAsDouble;
-            case HALF_UP:
-              return (x >= 0) ? roundCeilingAsDouble : roundFloorAsDouble;
-            default:
-              throw new AssertionError("impossible");
-          }
-        }
+      return handleHalfEvenMode(x,cmpXToRoundArbitrarily,roundArbitrarily,roundArbitrarilyAsLong,mode);
     }
     throw new AssertionError("impossible");
+  }
+  private static int compareXToRoundArbitrarily(long x, long roundArbitrarilyAsLong) {
+    if (roundArbitrarilyAsLong == Long.MAX_VALUE) {
+      return -1;
+    } else {
+      return Longs.compare(x, roundArbitrarilyAsLong);
+    }
+  }
+
+
+  private static double handleUnnecessaryMode(int cmpXToRoundArbitrarily, double roundArbitrarily) {
+    checkRoundingUnnecessary(cmpXToRoundArbitrarily == 0);
+    return roundArbitrarily;
+  }
+
+  private static double handleFloorMode(int cmpXToRoundArbitrarily, double roundArbitrarily) {
+    return (cmpXToRoundArbitrarily >= 0)
+            ? roundArbitrarily
+            : DoubleUtils.nextDown(roundArbitrarily);
+  }
+
+  private static double handleCeilingMode(int cmpXToRoundArbitrarily, double roundArbitrarily) {
+    return (cmpXToRoundArbitrarily <= 0)
+            ? roundArbitrarily
+            : Math.nextUp(roundArbitrarily);
+  }
+
+  private static double handleDownMode(long x, int cmpXToRoundArbitrarily, double roundArbitrarily) {
+    return (x >= 0)
+            ? ((cmpXToRoundArbitrarily >= 0)
+            ? roundArbitrarily
+            : DoubleUtils.nextDown(roundArbitrarily))
+            : ((cmpXToRoundArbitrarily <= 0)
+            ? roundArbitrarily
+            : Math.nextUp(roundArbitrarily));
+  }
+
+  private static double handleUpMode(long x, int cmpXToRoundArbitrarily, double roundArbitrarily) {
+    return (x >= 0)
+            ? ((cmpXToRoundArbitrarily <= 0)
+            ? roundArbitrarily
+            : Math.nextUp(roundArbitrarily))
+            : ((cmpXToRoundArbitrarily >= 0)
+            ? roundArbitrarily
+            : DoubleUtils.nextDown(roundArbitrarily));
+  }
+  private static double handleHalfEvenMode(long x, int cmpXToRoundArbitrarily, double roundArbitrarily,long roundArbitrarilyAsLong, RoundingMode mode){
+    long roundFloor;
+    double roundFloorAsDouble;
+    long roundCeiling;
+    double roundCeilingAsDouble;
+
+    if (cmpXToRoundArbitrarily >= 0) {
+      roundFloorAsDouble = roundArbitrarily;
+      roundFloor = roundArbitrarilyAsLong;
+      roundCeilingAsDouble = Math.nextUp(roundArbitrarily);
+      roundCeiling = (long) Math.ceil(roundCeilingAsDouble);
+    } else {
+      roundCeilingAsDouble = roundArbitrarily;
+      roundCeiling = roundArbitrarilyAsLong;
+      roundFloorAsDouble = DoubleUtils.nextDown(roundArbitrarily);
+      roundFloor = (long) Math.floor(roundFloorAsDouble);
+    }
+
+    long deltaToFloor = x - roundFloor;
+    long deltaToCeiling = roundCeiling - x;
+
+    if (roundCeiling == Long.MAX_VALUE) {
+      // correct for Long.MAX_VALUE as discussed above: roundCeilingAsDouble must be 2^63, but
+      // roundCeiling is 2^63-1.
+      deltaToCeiling++;
+    }
+
+    int diff = Longs.compare(deltaToFloor, deltaToCeiling);
+    if (diff < 0) { // closer to floor
+      return roundFloorAsDouble;
+    } else if (diff > 0) { // closer to ceiling
+      return roundCeilingAsDouble;
+    }
+    // halfway between the representable values; do the half-whatever logic
+    switch (mode) {
+      case HALF_EVEN:
+        return ((DoubleUtils.getSignificand(roundFloorAsDouble) & 1L) == 0)
+                ? roundFloorAsDouble
+                : roundCeilingAsDouble;
+      case HALF_DOWN:
+        return (x >= 0) ? roundFloorAsDouble : roundCeilingAsDouble;
+      case HALF_UP:
+        return (x >= 0) ? roundCeilingAsDouble : roundFloorAsDouble;
+      default:
+        throw new AssertionError("impossible");
+    }
   }
 
   private LongMath() {}
