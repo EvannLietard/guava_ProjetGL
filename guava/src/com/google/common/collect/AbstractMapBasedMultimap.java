@@ -1224,11 +1224,6 @@ abstract class AbstractMapBasedMultimap<K extends @Nullable Object, V extends @N
    * by the values of a second key, and so on.
    */
   @Override
-  public Collection<V> values() {
-    return super.values();
-  }
-
-  @Override
   Collection<V> createValues() {
     return new Values();
   }
@@ -1270,10 +1265,6 @@ abstract class AbstractMapBasedMultimap<K extends @Nullable Object, V extends @N
    * <p>Each entry is an immutable snapshot of a key-value mapping in the multimap, taken at the
    * time the entry is returned by a method call to the collection or its iterator.
    */
-  @Override
-  public Collection<Entry<K, V>> entries() {
-    return super.entries();
-  }
 
   @Override
   Collection<Entry<K, V>> createEntries() {
