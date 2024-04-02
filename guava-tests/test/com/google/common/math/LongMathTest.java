@@ -34,6 +34,7 @@ import static java.math.RoundingMode.UNNECESSARY;
 import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
+import com.google.common.math.exception.NegativeValueException;
 import com.google.common.testing.NullPointerTester;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -41,6 +42,7 @@ import java.math.RoundingMode;
 import java.util.EnumSet;
 import java.util.Random;
 import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Tests for LongMath.
@@ -790,7 +792,6 @@ public class LongMathTest extends TestCase {
     }
   }
 
-
   @J2ktIncompatible
   @GwtIncompatible // Slow
   public void testBinomial_exhaustiveNotOverflowing() {
@@ -807,8 +808,8 @@ public class LongMathTest extends TestCase {
     for (int n = 0; n <= 50; n++) {
       try {
         LongMath.binomial(n, -1);
-        fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
+        fail("Expected NegativeValueException");
+      } catch (NegativeValueException expected) {
       }
       try {
         LongMath.binomial(n, n + 1);
@@ -822,8 +823,8 @@ public class LongMathTest extends TestCase {
     for (int n : NEGATIVE_INTEGER_CANDIDATES) {
       try {
         LongMath.binomial(n, 0);
-        fail("Expected IllegalArgumentException");
-      } catch (IllegalArgumentException expected) {
+        fail("Expected NegativeValueException");
+      } catch (NegativeValueException expected) {
       }
     }
   }
