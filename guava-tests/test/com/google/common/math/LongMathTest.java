@@ -35,6 +35,7 @@ import com.google.common.annotations.GwtCompatible;
 import com.google.common.annotations.GwtIncompatible;
 import com.google.common.annotations.J2ktIncompatible;
 import com.google.common.math.exception.NegativeValueException;
+import com.google.common.math.exception.RoundingNecessaryException;
 import com.google.common.testing.NullPointerTester;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -42,7 +43,6 @@ import java.math.RoundingMode;
 import java.util.EnumSet;
 import java.util.Random;
 import junit.framework.TestCase;
-import org.junit.Test;
 
 /**
  * Tests for LongMath.
@@ -828,8 +828,6 @@ public class LongMathTest extends TestCase {
       }
     }
   }
-
-
   @J2ktIncompatible
   @GwtIncompatible // far too slow
   public void testSqrtOfPerfectSquareAsDoubleIsPerfect() {
@@ -1061,7 +1059,7 @@ public class LongMathTest extends TestCase {
       Double expectedDouble = null;
       try {
         expectedDouble = BigIntegerMath.roundToDouble(BigInteger.valueOf(candidate), UNNECESSARY);
-      } catch (ArithmeticException expected) {
+      } catch (RoundingNecessaryException expected) {
         // do nothing
       }
 
@@ -1070,8 +1068,8 @@ public class LongMathTest extends TestCase {
       } else {
         try {
           LongMath.roundToDouble(candidate, UNNECESSARY);
-          fail("Expected ArithmeticException on roundToDouble(" + candidate + ", UNNECESSARY)");
-        } catch (ArithmeticException expected) {
+          fail("Expected RoundingNecessaryException on roundToDouble(" + candidate + ", UNNECESSARY)");
+        } catch (RoundingNecessaryException expected) {
           // success
         }
       }
