@@ -1302,7 +1302,7 @@ public final class LongMath {
   }
 
 
-  private static double handleUnnecessaryMode(int cmpXToRoundArbitrarily, double roundArbitrarily) {
+  public static double handleUnnecessaryMode(int cmpXToRoundArbitrarily, double roundArbitrarily) {
     checkRoundingUnnecessary(cmpXToRoundArbitrarily == 0);
     return roundArbitrarily;
   }

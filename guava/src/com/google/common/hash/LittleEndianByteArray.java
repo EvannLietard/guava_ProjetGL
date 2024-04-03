@@ -22,6 +22,8 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import sun.misc.Unsafe;
 
+import static com.google.common.primitives.Longs.fromBytes;
+
 /**
  * Utility functions for loading and storing values from a byte array.
  *
@@ -210,15 +212,16 @@ final class LittleEndianByteArray {
     INSTANCE {
       @Override
       public long getLongLittleEndian(byte[] source, int offset) {
-        return Longs.fromBytes(
-            source[offset + 7],
-            source[offset + 6],
-            source[offset + 5],
-            source[offset + 4],
-            source[offset + 3],
-            source[offset + 2],
-            source[offset + 1],
-            source[offset]);
+        if (source.length - offset < 8) {
+          throw new IllegalArgumentException("Pas assez d'octets pour former un long à partir de l'offset spécifié.");
+        }
+
+        byte[] bytes = new byte[8];
+        for (int i = 0; i < 8; i++) {
+          bytes[i] = source[offset + i];
+        }
+
+        return fromBytes(bytes);
       }
 
       @Override

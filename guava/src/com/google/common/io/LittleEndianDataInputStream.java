@@ -134,16 +134,12 @@ public final class LittleEndianDataInputStream extends FilterInputStream impleme
   @CanIgnoreReturnValue // to skip some bytes
   @Override
   public long readLong() throws IOException {
-    byte b1 = readAndCheckByte();
-    byte b2 = readAndCheckByte();
-    byte b3 = readAndCheckByte();
-    byte b4 = readAndCheckByte();
-    byte b5 = readAndCheckByte();
-    byte b6 = readAndCheckByte();
-    byte b7 = readAndCheckByte();
-    byte b8 = readAndCheckByte();
+    byte[] bytes = new byte[8];
+    for (int i = 0; i < 8; i++) {
+      bytes[i] = readAndCheckByte();
+    }
 
-    return Longs.fromBytes(b8, b7, b6, b5, b4, b3, b2, b1);
+    return Longs.fromBytes(bytes);
   }
 
   /**

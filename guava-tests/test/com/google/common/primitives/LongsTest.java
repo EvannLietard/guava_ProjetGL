@@ -250,9 +250,6 @@ public class LongsTest extends TestCase {
 
   public void testFromByteArray() {
     assertThat(
-            Longs.fromByteArray(new byte[] {0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x33}))
-        .isEqualTo(0x1213141516171819L);
-    assertThat(
             Longs.fromByteArray(
                 new byte[] {
                   (byte) 0xFF, (byte) 0xEE, (byte) 0xDD, (byte) 0xCC,
@@ -272,26 +269,12 @@ public class LongsTest extends TestCase {
   public void testFromBytes() {
     assertThat(
             Longs.fromBytes(
-                (byte) 0x12,
-                (byte) 0x13,
-                (byte) 0x14,
-                (byte) 0x15,
-                (byte) 0x16,
-                (byte) 0x17,
-                (byte) 0x18,
-                (byte) 0x19))
-        .isEqualTo(0x1213141516171819L);
+                    new byte[] {0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19}))
+            .isEqualTo(0x1213141516171819L);
     assertThat(
             Longs.fromBytes(
-                (byte) 0xFF,
-                (byte) 0xEE,
-                (byte) 0xDD,
-                (byte) 0xCC,
-                (byte) 0xBB,
-                (byte) 0xAA,
-                (byte) 0x99,
-                (byte) 0x88))
-        .isEqualTo(0xFFEEDDCCBBAA9988L);
+                    new byte[] {(byte) 0xFF, (byte) 0xEE, (byte) 0xDD, (byte) 0xCC, (byte) 0xBB, (byte) 0xAA, (byte) 0x99, (byte) 0x88}))
+            .isEqualTo(0xFFEEDDCCBBAA9988L);
   }
 
   public void testByteArrayRoundTrips() {

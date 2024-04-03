@@ -306,7 +306,7 @@ public final class Longs {
   public static long fromByteArray(byte[] bytes) {
     checkArgument(bytes.length >= BYTES, "array too small: %s < %s", bytes.length, BYTES);
     return fromBytes(
-        bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]);
+        bytes);
   }
 
   /**
@@ -315,16 +315,19 @@ public final class Longs {
    *
    * @since 7.0
    */
-  public static long fromBytes(
-      byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7, byte b8) {
-    return (b1 & 0xFFL) << 56
-        | (b2 & 0xFFL) << 48
-        | (b3 & 0xFFL) << 40
-        | (b4 & 0xFFL) << 32
-        | (b5 & 0xFFL) << 24
-        | (b6 & 0xFFL) << 16
-        | (b7 & 0xFFL) << 8
-        | (b8 & 0xFFL);
+  public static long fromBytes(byte[] bytes) {
+    if (bytes.length != 8) {
+      throw new IllegalArgumentException("Le tableau d'octets doit avoir une longueur de 8.");
+    }
+
+    return ((long) (bytes[0] & 0xFF) << 56)
+            | ((long) (bytes[1] & 0xFF) << 48)
+            | ((long) (bytes[2] & 0xFF) << 40)
+            | ((long) (bytes[3] & 0xFF) << 32)
+            | ((long) (bytes[4] & 0xFF) << 24)
+            | ((long) (bytes[5] & 0xFF) << 16)
+            | ((long) (bytes[6] & 0xFF) << 8)
+            | (bytes[7] & 0xFF);
   }
 
   /*
