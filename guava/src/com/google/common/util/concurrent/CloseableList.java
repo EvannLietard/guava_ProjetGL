@@ -137,4 +137,26 @@ public  final class CloseableList extends IdentityHashMap<AutoCloseable, Executo
             closeQuietly(closeable, directExecutor());
         }
     }
+    @Override
+    public boolean equals(Object obj){
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        CloseableList other = (CloseableList) obj;
+        if (this.closed != other.closed||this.size() != other.size()) {
+            return false;
+        }
+        for (Map.Entry<AutoCloseable, Executor> entry : entrySet()) {
+            AutoCloseable key = entry.getKey();
+            Executor value = entry.getValue();
+            if (!other.containsKey(key) || !value.equals(other.get(key))) {
+                return false;
+            }
+        }
+        return true;
+
+    }
 }
