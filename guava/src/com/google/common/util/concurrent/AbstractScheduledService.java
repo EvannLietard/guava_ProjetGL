@@ -606,7 +606,8 @@ public abstract class AbstractScheduledService implements Service {
         Cancellable toReturn;
         lock.lock();
         try {
-          toReturn = initializeOrUpdateCancellationDelegate(schedule);
+          initializeOrUpdateCancellationDelegate(schedule);
+          toReturn= this.getCancellationDelegate();
         } catch (Throwable e) {
           // Any Exception is either a RuntimeException or sneaky checked exception.
           //
@@ -638,14 +639,16 @@ public abstract class AbstractScheduledService implements Service {
        * call to `new SupplantableFuture` below.)
        */
       @SuppressWarnings("GuardedBy")
-      private Cancellable initializeOrUpdateCancellationDelegate(Schedule schedule) {
+      private void initializeOrUpdateCancellationDelegate(Schedule schedule) {
         if (cancellationDelegate == null) {
-          return cancellationDelegate = new SupplantableFuture(lock, submitToExecutor(schedule));
+          this.cancellationDelegate = new SupplantableFuture(lock, submitToExecutor(schedule));
         }
         if (!cancellationDelegate.currentFuture.isCancelled()) {
-          cancellationDelegate.currentFuture = submitToExecutor(schedule);
+          this.cancellationDelegate.currentFuture = submitToExecutor(schedule);
         }
-        return cancellationDelegate;
+      }
+      private Cancellable getCancellationDelegate() {
+          return this.cancellationDelegate;
       }
 
       private ScheduledFuture<@Nullable Void> submitToExecutor(Schedule schedule) {
