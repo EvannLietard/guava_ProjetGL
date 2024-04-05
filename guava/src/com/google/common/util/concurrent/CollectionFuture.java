@@ -44,17 +44,17 @@ abstract class CollectionFuture<V extends @Nullable Object, C extends @Nullable 
       boolean allMustSucceed) {
     super(futures, allMustSucceed, true);
 
-    List<@Nullable Present<V>> values =
+    List<@Nullable Present<V>> localValues =
         futures.isEmpty()
             ? Collections.<@Nullable Present<V>>emptyList()
             : Lists.<@Nullable Present<V>>newArrayListWithCapacity(futures.size());
 
     // Populate the results list with null initially.
     for (int i = 0; i < futures.size(); ++i) {
-      values.add(null);
+      localValues.add(null);
     }
 
-    this.values = values;
+    this.values = localValues;
   }
 
   @Override
